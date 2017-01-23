@@ -1,0 +1,49 @@
+group 'ua.pl.mik'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+    }
+}
+
+task wrapper(type: Wrapper) {
+  gradleVersion = '3.3'
+  distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
+}
+
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = "ua.pl.mik.kakashkaposterbot.Main"
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+jar {
+    from {
+        (configurations.runtime).collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    manifest {
+        attributes("Main-Class": "ua.pl.mik.kakashkaposterbot.Main" )
+    }
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+
+    compile 'com.google.apis:google-api-services-androidpublisher:v2+'
+    compile 'org.xerial:sqlite-jdbc:3.16.1'
+    compile 'org.telegram:telegrambots:2.4.4'
+    compile 'com.squareup.okhttp3:okhttp:3.5.0'
+    compile 'com.google.code.gson:gson:+'
+    compile 'com.j256.ormlite:ormlite-jdbc:+'
+}

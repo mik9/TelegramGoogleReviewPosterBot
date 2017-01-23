@@ -1,0 +1,5 @@
+.gradle/
+build/
+data/
+.idea/
+TELEGRAM_TOKEN
