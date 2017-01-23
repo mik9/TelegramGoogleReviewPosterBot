@@ -1,17 +1,11 @@
 package ua.pl.mik.kakashkaposterbot;
 
-import com.google.api.services.androidpublisher.model.Review;
-import org.telegram.telegrambots.exceptions.TelegramApiException;
-import ua.pl.mik.kakashkaposterbot.bot.TelegramReview;
 import ua.pl.mik.kakashkaposterbot.db.Database;
 import ua.pl.mik.kakashkaposterbot.db.models.App;
-import ua.pl.mik.kakashkaposterbot.utils.TelegramUtils;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -22,48 +16,6 @@ public class Scheduler {
     private static HashMap<App, ScheduledFuture> appFutureMap = new HashMap<>();
 
     private static final long PERIOD = 2; // min
-
-    public static class Task implements Runnable {
-
-        private App app;
-
-        public Task(App app) {
-            this.app = app;
-        }
-
-        @Override
-        public void run() {
-            System.out.println("Running update task for: " + app.packageName);
-            List<Review> reviews = Collections.emptyList();
-            try {
-                reviews = GoogleApi.getNewReviews(app.packageName, app.keyFilePath, app.lastReviewId);
-            } catch (Exception e) {
-                System.out.println("Reviews downloading failed.");
-            }
-            System.out.println("Got " + reviews.size() + " new reviews");
-            if (!reviews.isEmpty()) {
-                app.lastReviewId = reviews.get(0).getReviewId();
-            }
-            reviews.stream()
-                    .map(TelegramReview::new)
-                    .map(review -> {
-                        if (review.text != null) {
-                            review.text = GoogleApi.translate(review.text);
-                        }
-                        return review;
-                    })
-                    .forEach(s -> {
-                        try {
-                            TelegramUtils.sendSimpleTextMessage(app.chatId, s.render());
-                        } catch (TelegramApiException e) {
-                            e.printStackTrace();
-                        }
-                    });
-
-            app.lastCheckTime = LocalDateTime.now();
-            Database.get().saveApp(app);
-        }
-    }
 
     public static void init() {
         Database.get().listApps()

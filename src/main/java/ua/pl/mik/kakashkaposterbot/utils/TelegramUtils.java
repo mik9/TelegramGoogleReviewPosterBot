@@ -32,11 +32,39 @@ public class TelegramUtils {
         return chatAdmins.stream().anyMatch(chatMember -> Objects.equals(chatMember.getUser().getId(), user.getId()));
     }
 
+    public static List<List<InlineKeyboardButton>> createBotInlineSelectionKeyboard(Update update, String command)
+            throws TelegramApiException {
+        GetChatAdministrators getChatAdministrators = new GetChatAdministrators();
+        getChatAdministrators.setChatId(getChatId(update));
+        List<ChatMember> chatAdministrators =
+                TelegramBotImpl.telegramAbsSender.getChatAdministrators(getChatAdministrators);
+
+        Set<App> appSet;
+        if (isUserAdmin(chatAdministrators, update.getMessage().getFrom())) {
+            appSet = Database.get().listApps(getChatId(update));
+        } else {
+            appSet = Database.get().listApps(getChatId(update), getUserId(update));
+        }
+
+        return appSet.stream()
+                .map(app -> {
+                    InlineKeyboardButton button = new InlineKeyboardButton();
+                    button.setText(app.getName());
+                    button.setCallbackData(command + " " + String.valueOf(app.id));
+                    return button;
+                })
+                .map(Collections::singletonList)
+                .collect(Collectors.toList());
+    }
+
     public static File generateKeyFile() {
         return new File("data/" + UUID.randomUUID().toString());
     }
 
-    public static String androidApiVersionToString(int apiVersion) {
+    public static String androidApiVersionToString(@Nullable Integer apiVersion) {
+        if (apiVersion == null) {
+            return null;
+        }
         switch (apiVersion) {
             case 25:
                 return "7.1";

@@ -11,7 +11,9 @@ public class TelegramReview {
     public String text;
     private final int stars;
     private final String authorName;
+    @Nullable
     private final String androidVersion;
+    @Nullable
     private final String deviceName;
 
     public TelegramReview(Review review) {
@@ -24,11 +26,15 @@ public class TelegramReview {
 
     public String render() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(authorName)
-                .append(" from ")
-                .append(deviceName)
-                .append(" on Android ")
-                .append(androidVersion);
+        stringBuilder.append(authorName);
+        if (deviceName != null) {
+            stringBuilder.append(" from ")
+                    .append(deviceName);
+        }
+        if (androidVersion != null) {
+            stringBuilder.append(" on Android ")
+                    .append(androidVersion);
+        }
         stringBuilder.append("\n");
         for (int i = 0; i < stars; i++) {
             stringBuilder.append("⭐️");
