@@ -1,24 +1,51 @@
 package ua.pl.mik.kakashkaposterbot.utils;
 
+import org.telegram.telegrambots.api.methods.groupadministration.GetChatAdministrators;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.ChatMember;
+import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.api.objects.User;
+import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ua.pl.mik.kakashkaposterbot.bot.TelegramBotImpl;
+import ua.pl.mik.kakashkaposterbot.db.Database;
+import ua.pl.mik.kakashkaposterbot.db.models.App;
 
+import javax.annotation.Nullable;
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class TelegramUtils {
     public static long getChatId(Update update) {
-        return update.getMessage().getChatId();
+        if (update.getMessage() != null) {
+            return getChatId(update.getMessage());
+        } else if (update.getCallbackQuery().getMessage() != null) {
+            return getChatId(update.getCallbackQuery().getMessage());
+        }
+        throw new RuntimeException();
     }
 
     public static long getUserId(Update update) {
-        return update.getMessage().getFrom().getId();
+        if (update.getMessage() != null) {
+            return getUserId(update.getMessage());
+        } else if (update.getCallbackQuery().getMessage() != null) {
+            return getUserId(update.getCallbackQuery().getMessage());
+        }
+        throw new RuntimeException();
+    }
+
+    public static long getChatId(Message message) {
+        return message.getChatId();
+    }
+
+    public static long getUserId(Message message) {
+        return message.getFrom().getId();
     }
 
     public static void sendSimpleTextMessage(long chatId, String message) throws TelegramApiException {

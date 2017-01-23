@@ -28,6 +28,8 @@ public class App {
     public LocalDateTime lastCheckTime;
     @DatabaseField(canBeNull = true)
     public String lastReviewId;
+    @DatabaseField(canBeNull = false)
+    public String translateLanguage;
 
     public String getName() {
         return name != null ? name : packageName;

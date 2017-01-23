@@ -80,12 +80,12 @@ public class GoogleApi {
         return reviews;
     }
 
-    public static String translate(String text) {
-        String url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=uk&dt=t&q=%s";
+    public static String translate(String text, String targenLanguage) {
+        String url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=%s&dt=t&q=%s";
         try {
             Request request = new Request.Builder()
                     .header("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/602.3.12 (KHTML, like Gecko) Version/10.0.2 Safari/602.3.12")
-                    .url(String.format(url, URLEncoder.encode(text, "UTF-8")))
+                    .url(String.format(url, targenLanguage, URLEncoder.encode(text, "UTF-8")))
                     .build();
             Response response = client.newCall(request).execute();
             byte[] bytes = response.body().bytes();

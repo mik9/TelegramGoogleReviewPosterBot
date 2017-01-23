@@ -1,4 +1,4 @@
-package ua.pl.mik.kakashkaposterbot.bot.handlers.appmanagement.delete;
+package ua.pl.mik.kakashkaposterbot.bot.handlers.appmanagement.changelanguage;
 
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Update;
@@ -13,23 +13,25 @@ import java.util.List;
 
 import static ua.pl.mik.kakashkaposterbot.utils.TelegramUtils.getChatId;
 
-public class DeleteHandler extends BaseTextMessageHandler {
+public class ChangeLanguageHandler extends BaseTextMessageHandler {
+
     @Override
     protected boolean handleTextMessage(Update update) throws TelegramApiException {
-        if (!update.getMessage().getText().startsWith("/delete")) {
+        if (!update.getMessage().getText().startsWith("/changelanguage")) {
             return false;
         }
 
-        List<List<InlineKeyboardButton>> buttons = TelegramUtils.createBotInlineSelectionKeyboard(update, "delete");
+        List<List<InlineKeyboardButton>> buttons =
+                TelegramUtils.createBotInlineSelectionKeyboard(update, "changelanguage");
 
         if (buttons.isEmpty()) {
-            TelegramUtils.sendSimpleTextMessage(getChatId(update), "Немає завдань які ви можете видалити.");
+            TelegramUtils.sendSimpleTextMessage(getChatId(update), "Немає завдань для яких можна змінити мову.");
             return true;
         }
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(getChatId(update));
-        sendMessage.setText("Яке завдання ви хотіли б видалити?");
+        sendMessage.setText("В якому завданні ви хотіли б змінити мову?");
         sendMessage.setReplyMarkup(new InlineKeyboardMarkup().setKeyboard(buttons));
 
         TelegramBotImpl.telegramAbsSender.sendMessage(sendMessage);

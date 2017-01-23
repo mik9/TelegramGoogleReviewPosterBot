@@ -10,19 +10,23 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
 import ua.pl.mik.kakashkaposterbot.bot.handlers.AbortHandler;
+import ua.pl.mik.kakashkaposterbot.bot.handlers.LogHandler;
+import ua.pl.mik.kakashkaposterbot.bot.handlers.StartHandler;
+import ua.pl.mik.kakashkaposterbot.bot.handlers.StatusHandler;
 import ua.pl.mik.kakashkaposterbot.bot.handlers.addapp.AddAppHandler;
 import ua.pl.mik.kakashkaposterbot.bot.handlers.addapp.KeyFileHandler;
-import ua.pl.mik.kakashkaposterbot.bot.handlers.LogHandler;
 import ua.pl.mik.kakashkaposterbot.bot.handlers.addapp.PackageNameHandler;
+import ua.pl.mik.kakashkaposterbot.bot.handlers.appmanagement.activation.DeactivateAppNameHandler;
+import ua.pl.mik.kakashkaposterbot.bot.handlers.appmanagement.activation.DeactivateHandler;
+import ua.pl.mik.kakashkaposterbot.bot.handlers.appmanagement.changelanguage.ChangeLanguageCallbackHandler;
+import ua.pl.mik.kakashkaposterbot.bot.handlers.appmanagement.changelanguage.ChangeLanguageHandler;
+import ua.pl.mik.kakashkaposterbot.bot.handlers.appmanagement.changelanguage.ChangeLanguageName;
 import ua.pl.mik.kakashkaposterbot.bot.handlers.appmanagement.delete.DeleteCallbackHandler;
 import ua.pl.mik.kakashkaposterbot.bot.handlers.appmanagement.delete.DeleteHandler;
 import ua.pl.mik.kakashkaposterbot.bot.handlers.appmanagement.setname.SetNameAppChosenHandler;
 import ua.pl.mik.kakashkaposterbot.bot.handlers.appmanagement.setname.SetNameHandler;
 import ua.pl.mik.kakashkaposterbot.bot.handlers.appmanagement.setname.SetNameInitHandler;
-import ua.pl.mik.kakashkaposterbot.bot.handlers.StartHandler;
-import ua.pl.mik.kakashkaposterbot.bot.handlers.StatusHandler;
-import ua.pl.mik.kakashkaposterbot.bot.handlers.appmanagement.activation.DeactivateAppNameHandler;
-import ua.pl.mik.kakashkaposterbot.bot.handlers.appmanagement.activation.DeactivateHandler;
+import ua.pl.mik.kakashkaposterbot.utils.TelegramUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,6 +35,7 @@ import java.nio.charset.Charset;
 public class TelegramBotImpl extends TelegramLongPollingBot {
 
     public static final String TOKEN;
+
     static {
         try {
             TOKEN = Files.readFirstLine(new File("TELEGRAM_TOKEN"), Charset.defaultCharset());
@@ -38,6 +43,7 @@ public class TelegramBotImpl extends TelegramLongPollingBot {
             throw new RuntimeException(e);
         }
     }
+
     public static DefaultAbsSender telegramAbsSender;
 
     public static void init() {
@@ -74,7 +80,12 @@ public class TelegramBotImpl extends TelegramLongPollingBot {
 
             // Delete flow
             new DeleteHandler(),
-            new DeleteCallbackHandler()
+            new DeleteCallbackHandler(),
+
+            // Change language
+            new ChangeLanguageHandler(),
+            new ChangeLanguageCallbackHandler(),
+            new ChangeLanguageName(),
     };
 
     @Override
@@ -92,7 +103,7 @@ public class TelegramBotImpl extends TelegramLongPollingBot {
                 break;
             } catch (BotAnswerException e) {
                 SendMessage resp = new SendMessage();
-                resp.setChatId(update.getMessage().getChatId());
+                resp.setChatId(TelegramUtils.getChatId(update));
                 resp.setText(e.getMessage());
                 try {
                     sendMessage(resp);
@@ -102,13 +113,13 @@ public class TelegramBotImpl extends TelegramLongPollingBot {
             }
         }
         if (!handled) {
-            System.out.println("Message not handler by anyone");
+            System.out.println("Message not handled by anyone");
         }
     }
 
     @Override
     public String getBotUsername() {
-        return "Kakashka";
+        return "Google Play Review Bot";
     }
 
     @Override

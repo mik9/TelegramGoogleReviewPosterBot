@@ -10,11 +10,11 @@ import ua.pl.mik.kakashkaposterbot.utils.TelegramUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class Task implements Runnable {
+public class PeriodicTask implements Runnable {
 
     private App app;
 
-    public Task(App app) {
+    public PeriodicTask(App app) {
         this.app = app;
     }
 
@@ -38,7 +38,7 @@ public class Task implements Runnable {
                 .map(TelegramReview::new)
                 .map(review -> {
                     if (review.text != null) {
-                        review.text = GoogleApi.translate(review.text);
+                        review.text = GoogleApi.translate(review.text, app.translateLanguage);
                     }
                     return review;
                 })

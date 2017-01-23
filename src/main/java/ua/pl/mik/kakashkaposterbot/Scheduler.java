@@ -37,7 +37,7 @@ public class Scheduler {
             }
         }
         System.out.println("Scheduling app: " + app.packageName + " to run in " + delay + " minutes");
-        ScheduledFuture<?> future = scheduledExecutorService.scheduleAtFixedRate(new Task(app), delay, PERIOD, TimeUnit.MINUTES);
+        ScheduledFuture<?> future = scheduledExecutorService.scheduleAtFixedRate(new PeriodicTask(app), delay, PERIOD, TimeUnit.MINUTES);
         appFutureMap.put(app, future);
     }
 

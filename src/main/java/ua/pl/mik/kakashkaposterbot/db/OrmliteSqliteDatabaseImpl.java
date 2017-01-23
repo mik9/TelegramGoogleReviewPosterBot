@@ -19,7 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class OrmliteSqliteDatabaseImpl implements IDatabase {
-    public static final int DB_VERSION = 2;
+    public static final int DB_VERSION = 3;
     public static final String DB_VERSION_FILE_NAME = "data/db_version";
 
     private RuntimeExceptionDao<Chat, Long> chatDao;
@@ -67,6 +67,11 @@ public class OrmliteSqliteDatabaseImpl implements IDatabase {
         if (version < DB_VERSION) {
             if (version == 1) {
                 chatDao.executeRaw("alter table `chat` add column `customStateData` VARCHAR default null");
+                version = 2;
+            }
+            if (version == 2) {
+                chatDao.executeRaw("alter table `app` add column `translateLanguage` VARCHAR not null default uk");
+                version = 3;
             }
         }
         writeCurrentVersion();

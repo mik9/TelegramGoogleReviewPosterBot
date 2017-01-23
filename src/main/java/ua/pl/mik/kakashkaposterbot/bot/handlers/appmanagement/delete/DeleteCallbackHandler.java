@@ -30,7 +30,7 @@ public class DeleteCallbackHandler extends BaseCallbackQueryHandler {
             answerCallbackQuery.setText("Невідома задача, може вона вже видалена?");
 
             TelegramBotImpl.telegramAbsSender.answerCallbackQuery(answerCallbackQuery);
-            return false;
+            return true;
         }
         try {
             Files.deleteIfExists(new File(app.keyFilePath).toPath());
