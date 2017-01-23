@@ -40,7 +40,7 @@ public class TelegramBotImpl extends TelegramLongPollingBot {
         try {
             TOKEN = Files.readFirstLine(new File("TELEGRAM_TOKEN"), Charset.defaultCharset());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("File TELEGRAM_TOKEN not found. Please get bot token from http://telegram.me/botfather and save it as TELEGRAM_TOKEN file.", e);
         }
     }
 

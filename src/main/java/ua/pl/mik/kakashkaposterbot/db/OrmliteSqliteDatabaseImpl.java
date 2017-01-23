@@ -1,5 +1,6 @@
 package ua.pl.mik.kakashkaposterbot.db;
 
+import com.google.common.io.Files;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
@@ -8,12 +9,10 @@ import ua.pl.mik.kakashkaposterbot.db.models.App;
 import ua.pl.mik.kakashkaposterbot.db.models.Chat;
 import ua.pl.mik.kakashkaposterbot.db.models.PendingApp;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -46,24 +45,15 @@ public class OrmliteSqliteDatabaseImpl implements IDatabase {
         }
 
         int version;
-        BufferedReader bufferedReader = null;
         try {
-            bufferedReader = new BufferedReader(new FileReader(DB_VERSION_FILE_NAME));
-            version = Integer.valueOf(bufferedReader.readLine());
+            version = Integer.valueOf(Files.readFirstLine(new File(DB_VERSION_FILE_NAME), Charset.defaultCharset()));
         } catch (FileNotFoundException e) {
             writeCurrentVersion();
             version = DB_VERSION;
         } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            if (bufferedReader != null) {
-                try {
-                    bufferedReader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            throw new RuntimeException("Can't read database version file.");
         }
+
         if (version < DB_VERSION) {
             if (version == 1) {
                 chatDao.executeRaw("alter table `chat` add column `customStateData` VARCHAR default null");
@@ -79,20 +69,10 @@ public class OrmliteSqliteDatabaseImpl implements IDatabase {
 
     private void writeCurrentVersion() {
         String versionString = String.valueOf(DB_VERSION);
-        BufferedWriter bufferedWriter = null;
         try {
-            bufferedWriter = new BufferedWriter(new FileWriter(DB_VERSION_FILE_NAME));
-            bufferedWriter.write(versionString);
+            Files.write(versionString, new File(DB_VERSION_FILE_NAME), Charset.defaultCharset());
         } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            try {
-                if (bufferedWriter != null) {
-                    bufferedWriter.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            throw new RuntimeException("Can't update database version file.");
         }
     }
 
