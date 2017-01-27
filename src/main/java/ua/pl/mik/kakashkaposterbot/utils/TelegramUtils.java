@@ -2,6 +2,7 @@ package ua.pl.mik.kakashkaposterbot.utils;
 
 import org.telegram.telegrambots.api.methods.groupadministration.GetChatAdministrators;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.objects.Chat;
 import org.telegram.telegrambots.api.objects.ChatMember;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
@@ -59,20 +60,46 @@ public class TelegramUtils {
         return chatAdmins.stream().anyMatch(chatMember -> Objects.equals(chatMember.getUser().getId(), user.getId()));
     }
 
+    public static boolean isUserAdmin(User user, Chat chat) {
+        GetChatAdministrators ar = new GetChatAdministrators();
+        ar.setChatId(chat.getId());
+
+        try {
+            return isUserAdmin(TelegramBotImpl.telegramAbsSender.getChatAdministrators(ar), user);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static Set<App> getAppsForChat(Chat chat, User user) {
+        Set<App> apps;
+        if (chat.isUserChat()) {
+            apps = Database.get().listAppsByUserId(user.getId());
+        } else if (isUserAdmin(user, chat)) {
+            apps = Database.get().listAppsByChatId(chat.getId());
+        } else {
+            apps = Database.get().listAppsByChatId(chat.getId(), user.getId());
+        }
+        return apps;
+    }
+
+    public static boolean isManagementAllowed(Chat chat, User user, App app) {
+        if (app.userId == user.getId() && app.chatId == chat.getId()) {
+            return true;
+        }
+        if (app.chatId == chat.getId() && isUserAdmin(user, chat)) {
+            return true;
+        }
+        if (app.userId == user.getId() && chat.isUserChat()) {
+            return true;
+        }
+        return false;
+    }
+
     public static List<List<InlineKeyboardButton>> createBotInlineSelectionKeyboard(Update update, String command)
             throws TelegramApiException {
-        GetChatAdministrators getChatAdministrators = new GetChatAdministrators();
-        getChatAdministrators.setChatId(getChatId(update));
-        List<ChatMember> chatAdministrators =
-                TelegramBotImpl.telegramAbsSender.getChatAdministrators(getChatAdministrators);
-
-        Set<App> appSet;
-        if (isUserAdmin(chatAdministrators, update.getMessage().getFrom())) {
-            appSet = Database.get().listApps(getChatId(update));
-        } else {
-            appSet = Database.get().listApps(getChatId(update), getUserId(update));
-        }
-
+        Set<App> appSet = getAppsForChat(update.getMessage().getChat(), update.getMessage().getFrom());
         return appSet.stream()
                 .map(app -> {
                     InlineKeyboardButton button = new InlineKeyboardButton();

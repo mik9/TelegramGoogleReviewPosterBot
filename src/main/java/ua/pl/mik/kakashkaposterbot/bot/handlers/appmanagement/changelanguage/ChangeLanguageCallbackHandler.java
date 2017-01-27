@@ -13,7 +13,6 @@ import ua.pl.mik.kakashkaposterbot.db.models.ChatState;
 import ua.pl.mik.kakashkaposterbot.utils.TelegramUtils;
 
 import static ua.pl.mik.kakashkaposterbot.utils.TelegramUtils.getChatId;
-import static ua.pl.mik.kakashkaposterbot.utils.TelegramUtils.getUserId;
 
 public class ChangeLanguageCallbackHandler extends BaseCallbackQueryHandler {
     @Override
@@ -40,7 +39,7 @@ public class ChangeLanguageCallbackHandler extends BaseCallbackQueryHandler {
             TelegramBotImpl.telegramAbsSender.answerCallbackQuery(answerCallbackQuery);
             return true;
         }
-        if (app.userId != userId) {
+        if (!TelegramUtils.isManagementAllowed(update.getCallbackQuery().getMessage().getChat(), update.getCallbackQuery().getFrom(), app)) {
             return true;
         }
 
@@ -51,7 +50,7 @@ public class ChangeLanguageCallbackHandler extends BaseCallbackQueryHandler {
 
         TelegramUtils.sendSimpleTextMessage(getChatId(update.getCallbackQuery().getMessage()),
                 "Уведіть двобуквенний код (див. https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes).\n" +
-                "Увага, не всі коди підримуються Google Translate.");
+                        "Увага, не всі коди підримуються Google Translate.");
 
         return true;
     }

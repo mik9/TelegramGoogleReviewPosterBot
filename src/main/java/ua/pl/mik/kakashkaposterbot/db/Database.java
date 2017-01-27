@@ -4,7 +4,7 @@ public class Database {
     private static IDatabase database;
 
     public static void init() {
-        database = new OrmliteSqliteDatabaseImpl();
+        database = new OrmLiteSqliteDatabaseImpl();
 
         database.init();
     }

@@ -6,7 +6,7 @@ import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardRemove;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ua.pl.mik.kakashkaposterbot.Scheduler;
 import ua.pl.mik.kakashkaposterbot.bot.TelegramBotImpl;
-import ua.pl.mik.kakashkaposterbot.bot.handlers.BaseTextMessageHandler;
+import ua.pl.mik.kakashkaposterbot.bot.handlers.BaseCallbackQueryHandler;
 import ua.pl.mik.kakashkaposterbot.db.Database;
 import ua.pl.mik.kakashkaposterbot.db.models.App;
 import ua.pl.mik.kakashkaposterbot.db.models.Chat;
@@ -18,16 +18,22 @@ import java.util.Optional;
 import static ua.pl.mik.kakashkaposterbot.utils.TelegramUtils.getChatId;
 import static ua.pl.mik.kakashkaposterbot.utils.TelegramUtils.getUserId;
 
-public class DeactivateAppNameHandler extends BaseTextMessageHandler {
+public class DeactivateAppNameHandler extends BaseCallbackQueryHandler {
+
     @Override
-    protected boolean handleTextMessage(Update update) throws TelegramApiException {
+    protected boolean handleCallbackQuery(Update update) throws TelegramApiException {
         Chat chat = Database.get().getOrCreateChat(getChatId(update), getUserId(update));
         if (chat.state != ChatState.WAITING_FOR_APP_TO_STOP) {
             return false;
         }
         String userText = update.getMessage().getText();
 
-        Optional<App> appOptional = Database.get().listApps(getChatId(update), getUserId(update))
+//        if (!TelegramUtils.isManagementAllowed(update.getCallbackQuery().getMessage().getChat(),
+//                update.getCallbackQuery().getMessage().getFrom())) {
+//
+//        }
+
+        Optional<App> appOptional = Database.get().listAppsByChatId(getChatId(update), getUserId(update))
                 .stream().filter(app -> app.packageName.equals(userText))
                 .findAny();
 

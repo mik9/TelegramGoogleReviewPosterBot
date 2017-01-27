@@ -24,7 +24,7 @@ public class SetNameInitHandler extends BaseTextMessageHandler {
             return false;
         }
 
-        List<List<InlineKeyboardButton>> inlineKeyboard = Database.get().listApps(getChatId(update), getUserId(update))
+        List<List<InlineKeyboardButton>> inlineKeyboard = Database.get().listAppsByChatId(getChatId(update), getUserId(update))
                 .stream()
                 .map((app) -> {
                     InlineKeyboardButton button = new InlineKeyboardButton();

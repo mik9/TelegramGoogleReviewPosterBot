@@ -2,6 +2,7 @@ package ua.pl.mik.kakashkaposterbot.bot.handlers.appmanagement.changelanguage;
 
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import ua.pl.mik.kakashkaposterbot.Scheduler;
 import ua.pl.mik.kakashkaposterbot.bot.handlers.BaseTextMessageHandler;
 import ua.pl.mik.kakashkaposterbot.db.Database;
 import ua.pl.mik.kakashkaposterbot.db.models.App;
@@ -40,12 +41,16 @@ public class ChangeLanguageName extends BaseTextMessageHandler {
 
         App app = Database.get().getApp(Long.valueOf(chat.customStateData));
         app.translateLanguage = newLanguage;
+        app.lastReviewId = null;
         Database.get().saveApp(app);
 
         chat.clearState();
         Database.get().saveChat(chat);
 
         TelegramUtils.sendSimpleTextMessage(getChatId(update), "Змінено!");
+
+        Scheduler.unSchedule(app);
+        Scheduler.scheduleAppNow(app);
 
         return true;
     }

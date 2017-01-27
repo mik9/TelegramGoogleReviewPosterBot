@@ -2,12 +2,13 @@ package ua.pl.mik.kakashkaposterbot.bot.handlers;
 
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-import ua.pl.mik.kakashkaposterbot.db.Database;
 import ua.pl.mik.kakashkaposterbot.db.models.App;
 import ua.pl.mik.kakashkaposterbot.utils.TelegramUtils;
 
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static ua.pl.mik.kakashkaposterbot.utils.TelegramUtils.getChatId;
 
 public class StatusHandler extends BaseTextMessageHandler {
     @Override
@@ -16,16 +17,17 @@ public class StatusHandler extends BaseTextMessageHandler {
             return false;
         }
 
-        Set<String> strings = Database.get().listApps(TelegramUtils.getChatId(update), TelegramUtils.getUserId(update))
-                .stream()
+        Set<App> apps = TelegramUtils.getAppsForChat(update.getMessage().getChat(), update.getMessage().getFrom());
+
+        Set<String> strings = apps.stream()
                 .map(App::getName)
                 .collect(Collectors.toSet());
 
         if (strings.isEmpty()) {
-            TelegramUtils.sendSimpleTextMessage(TelegramUtils.getChatId(update), "Немає налаштованих завдань в цьому чаті.");
+            TelegramUtils.sendSimpleTextMessage(getChatId(update), "Немає налаштованих завдань в цьому чаті.");
         } else {
             String resp = "Я буду постить коментарі до наступних програм:\n" + String.join("\n", strings);
-            TelegramUtils.sendSimpleTextMessage(TelegramUtils.getChatId(update), resp);
+            TelegramUtils.sendSimpleTextMessage(getChatId(update), resp);
         }
 
         return true;

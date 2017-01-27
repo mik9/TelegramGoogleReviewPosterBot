@@ -2,7 +2,9 @@ package ua.pl.mik.kakashkaposterbot.bot.handlers.appmanagement.activation;
 
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
@@ -30,34 +32,23 @@ public class DeactivateHandler extends BaseTextMessageHandler {
         Chat chat = Database.get().getOrCreateChat(getChatId(update), getUserId(update));
         if (chat.state != ChatState.NO_STATE) {
             throw new WrongStateException(chat.state);
+
         }
+        List<List<InlineKeyboardButton>> keyboard =
+                TelegramUtils.createBotInlineSelectionKeyboard(update, "deactivate");
 
-        List<KeyboardRow> keyboardRows = Database.get().listApps(getChatId(update), getUserId(update))
-                .stream()
-                .filter(app -> app.enabled)
-                .map(app -> app.packageName)
-                .map(s -> {
-                    KeyboardRow keyboardRow = new KeyboardRow();
-                    keyboardRow.add(new KeyboardButton(s));
-                    return keyboardRow;
-                }).collect(Collectors.toList());
-
-        if (keyboardRows.isEmpty()) {
+        if (keyboard.isEmpty()) {
             TelegramUtils.sendSimpleTextMessage(getChatId(update), "Немає завдань, що можна деактивувати.");
             return true;
         }
 
         SendMessage sendMessage = new SendMessage();
-        sendMessage.setReplyMarkup(new ReplyKeyboardMarkup()
-                .setKeyboard(keyboardRows)
-                .setOneTimeKeyboad(true));
+        sendMessage.setReplyMarkup(new InlineKeyboardMarkup()
+                .setKeyboard(keyboard));
         sendMessage.setChatId(getChatId(update));
         sendMessage.setText("Яке з завдань ви хочете деактивувати?");
 
-        chat.state = ChatState.WAITING_FOR_APP_TO_STOP;
-        Database.get().saveChat(chat);
         TelegramBotImpl.telegramAbsSender.sendMessage(sendMessage);
-
 
         return true;
     }

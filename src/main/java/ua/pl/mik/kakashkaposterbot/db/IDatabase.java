@@ -23,7 +23,8 @@ public interface IDatabase {
     App createApp(PendingApp pendingApp, long targetChatId, long targetUserId);
     void saveApp(App app);
     void deleteApp(App app);
-    Set<App> listApps();
-    Set<App> listApps(long chatId);
-    Set<App> listApps(long chatId, long userId);
+    Set<App> listAppsByChatId();
+    Set<App> listAppsByChatId(long chatId);
+    Set<App> listAppsByChatId(long chatId, long userId);
+    Set<App> listAppsByUserId(long userId);
 }

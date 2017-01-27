@@ -18,10 +18,14 @@ public class Scheduler {
     private static final long PERIOD = 2; // min
 
     public static void init() {
-        Database.get().listApps()
+        Database.get().listAppsByChatId()
                 .stream()
                 .filter(app -> app.enabled)
                 .forEach(Scheduler::scheduleApp);
+    }
+
+    public static void scheduleAppNow(App app) {
+        scheduleAppInternal(app, 0);
     }
 
     public static void scheduleApp(App app) {
@@ -36,6 +40,11 @@ public class Scheduler {
                 delay = 0;
             }
         }
+
+        scheduleAppInternal(app, delay);
+    }
+
+    private static void scheduleAppInternal(App app, long delay) {
         System.out.println("Scheduling app: " + app.packageName + " to run in " + delay + " minutes");
         ScheduledFuture<?> future = scheduledExecutorService.scheduleAtFixedRate(new PeriodicTask(app), delay, PERIOD, TimeUnit.MINUTES);
         appFutureMap.put(app, future);

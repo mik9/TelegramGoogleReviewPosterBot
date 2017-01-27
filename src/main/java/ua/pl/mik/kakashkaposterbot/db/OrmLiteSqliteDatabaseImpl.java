@@ -17,7 +17,7 @@ import java.sql.SQLException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class OrmliteSqliteDatabaseImpl implements IDatabase {
+public class OrmLiteSqliteDatabaseImpl implements IDatabase {
     public static final int DB_VERSION = 3;
     public static final String DB_VERSION_FILE_NAME = "data/db_version";
 
@@ -170,12 +170,12 @@ public class OrmliteSqliteDatabaseImpl implements IDatabase {
     }
 
     @Override
-    public Set<App> listApps() {
+    public Set<App> listAppsByChatId() {
         return appsDao.queryForAll().stream().collect(Collectors.toSet());
     }
 
     @Override
-    public Set<App> listApps(long chatId) {
+    public Set<App> listAppsByChatId(long chatId) {
         Set<App> apps;
         try {
             apps = appsDao.queryBuilder()
@@ -191,7 +191,7 @@ public class OrmliteSqliteDatabaseImpl implements IDatabase {
     }
 
     @Override
-    public Set<App> listApps(long chatId, long userId) {
+    public Set<App> listAppsByChatId(long chatId, long userId) {
         Set<App> apps;
         try {
             apps = appsDao.queryBuilder()
@@ -199,6 +199,22 @@ public class OrmliteSqliteDatabaseImpl implements IDatabase {
                     .where()
                     .eq("chatId", chatId)
                     .and()
+                    .eq("userId", userId)
+                    .query()
+                    .stream().collect(Collectors.toSet());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return apps;
+    }
+
+    @Override
+    public Set<App> listAppsByUserId(long userId) {
+        Set<App> apps;
+        try {
+            apps = appsDao.queryBuilder()
+                    .selectColumns()
+                    .where()
                     .eq("userId", userId)
                     .query()
                     .stream().collect(Collectors.toSet());

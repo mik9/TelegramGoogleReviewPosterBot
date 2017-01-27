@@ -29,7 +29,7 @@ public class App {
     @DatabaseField(canBeNull = true)
     public String lastReviewId;
     @DatabaseField(canBeNull = false)
-    public String translateLanguage;
+    public String translateLanguage = "uk";
 
     public String getName() {
         return name != null ? name : packageName;

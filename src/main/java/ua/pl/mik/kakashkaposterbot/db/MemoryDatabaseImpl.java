@@ -105,19 +105,25 @@ class MemoryDatabaseImpl implements IDatabase {
     }
 
     @Override
-    public Set<App> listApps() {
+    public Set<App> listAppsByChatId() {
         return Collections.emptySet();
     }
 
     @Override
-    public Set<App> listApps(long chatId) {
+    public Set<App> listAppsByChatId(long chatId) {
         return APP_STORAGE.stream().filter(app -> app.chatId == chatId)
                 .collect(Collectors.toSet());
     }
 
     @Override
-    public Set<App> listApps(long chatId, long userId) {
+    public Set<App> listAppsByChatId(long chatId, long userId) {
         return APP_STORAGE.stream().filter(app -> app.chatId == chatId && app.userId == userId)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<App> listAppsByUserId(long userId) {
+        return APP_STORAGE.stream().filter(app -> app.userId == userId)
                 .collect(Collectors.toSet());
     }
 }
