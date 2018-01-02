@@ -19,12 +19,12 @@ import java.util.Set;
 import static ua.pl.mik.kakashkaposterbot.utils.TelegramUtils.getChatId;
 import static ua.pl.mik.kakashkaposterbot.utils.TelegramUtils.getUserId;
 
-public class DeactivateAppNameHandler extends BaseCallbackQueryHandler {
+public class ActivateAppNameHandler extends BaseCallbackQueryHandler {
 
     @Override
     protected boolean handleCallbackQuery(Update update) throws TelegramApiException {
         Chat chat = Database.get().getOrCreateChat(getChatId(update), getUserId(update));
-        if (chat.state != ChatState.WAITING_FOR_APP_TO_STOP) {
+        if (chat.state != ChatState.WAITING_FOR_APP_TO_START) {
             return false;
         }
         String userText = update.getCallbackQuery().getData();
@@ -48,14 +48,14 @@ public class DeactivateAppNameHandler extends BaseCallbackQueryHandler {
 
         if (appOptional.isPresent()) {
             App app = appOptional.get();
-            app.enabled = false;
+            app.enabled = true;
             Database.get().saveApp(app);
-            Scheduler.unSchedule(app);
+            Scheduler.scheduleApp(app);
 
             SendMessage sendMessage = new SendMessage();
             sendMessage.setReplyMarkup(new ReplyKeyboardRemove());
             sendMessage.setChatId(getChatId(update));
-            sendMessage.setText("Завдання вимкнено але не видалено.");
+            sendMessage.setText("Завдання увімкнено.");
 
             TelegramBotImpl.telegramAbsSender.sendMessage(sendMessage);
         } else {

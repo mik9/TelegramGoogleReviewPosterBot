@@ -24,6 +24,13 @@ public class PendingApp {
         this.userId = userId;
     }
 
+    public PendingApp(App app) {
+        this.chatId = app.chatId;
+        this.userId = app.userId;
+        this.packageName = app.packageName;
+        this.keyFilePath = app.keyFilePath;
+    }
+
     public PendingApp() {
     }
 

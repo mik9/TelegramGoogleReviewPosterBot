@@ -1,5 +1,7 @@
 package ua.pl.mik.kakashkaposterbot;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ua.pl.mik.kakashkaposterbot.db.Database;
 import ua.pl.mik.kakashkaposterbot.db.models.App;
 
@@ -15,7 +17,9 @@ public class Scheduler {
     private static ScheduledExecutorService scheduledExecutorService = new ScheduledThreadPoolExecutor(1);
     private static HashMap<App, ScheduledFuture> appFutureMap = new HashMap<>();
 
-    private static final long PERIOD = 2; // min
+    private static final long PERIOD = 10; // min
+
+    private static final Logger logger = LoggerFactory.getLogger(Scheduler.class);
 
     public static void init() {
         Database.get().listAppsByChatId()
@@ -45,7 +49,7 @@ public class Scheduler {
     }
 
     private static void scheduleAppInternal(App app, long delay) {
-        System.out.println("Scheduling app: " + app.packageName + " to run in " + delay + " minutes");
+        logger.debug("Scheduling app: {} to run in {} minutes", app.packageName, delay);
         ScheduledFuture<?> future = scheduledExecutorService.scheduleAtFixedRate(new PeriodicTask(app), delay, PERIOD, TimeUnit.MINUTES);
         appFutureMap.put(app, future);
     }

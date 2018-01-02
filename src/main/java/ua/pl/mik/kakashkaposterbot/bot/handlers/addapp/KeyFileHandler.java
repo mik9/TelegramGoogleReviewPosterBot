@@ -1,6 +1,8 @@
 package ua.pl.mik.kakashkaposterbot.bot.handlers.addapp;
 
 import com.google.common.io.Files;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.api.methods.GetFile;
 import org.telegram.telegrambots.api.objects.File;
 import org.telegram.telegrambots.api.objects.Update;
@@ -19,6 +21,8 @@ import static ua.pl.mik.kakashkaposterbot.utils.TelegramUtils.getChatId;
 import static ua.pl.mik.kakashkaposterbot.utils.TelegramUtils.getUserId;
 
 public class KeyFileHandler implements Handler {
+
+    private static final Logger logger = LoggerFactory.getLogger(KeyFileHandler.class);
 
     public static final String READY_MESSAGE = "Завдання готове. Ви можете додати мене у групу за наступним посиланням:\n" +
             "https://telegram.me/kakashkaposterbot?startgroup=%d";
@@ -43,7 +47,7 @@ public class KeyFileHandler implements Handler {
             } catch (IOException e) {
                 throw new RuntimeException("Can't move file.", e);
             }
-            System.out.println(keyFile.getAbsolutePath());
+            logger.debug(keyFile.getAbsolutePath());
 
             chat.state = ChatState.NO_STATE;
             Database.get().saveChat(chat);

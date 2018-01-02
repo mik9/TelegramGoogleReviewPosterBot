@@ -23,11 +23,10 @@ import java.util.List;
 import java.util.Objects;
 
 public class GoogleApi {
-    private static OkHttpClient client;
+    private static OkHttpClient client = new OkHttpClient.Builder()
+            .build();
 
     public static void init() {
-        client = new OkHttpClient.Builder()
-                .build();
     }
 
     private static AndroidPublisher androidPublisherFactory(String keyPath) {
@@ -53,7 +52,8 @@ public class GoogleApi {
         String token = null;
         try {
             do {
-                AndroidPublisher.Reviews.List call = androidPublisherFactory(keyPath).reviews().list(packageName);
+                AndroidPublisher.Reviews.List call = androidPublisherFactory(keyPath).reviews()
+                        .list(packageName);
                 if (token != null) {
                     call.setToken(token);
                 }
@@ -91,11 +91,14 @@ public class GoogleApi {
             byte[] bytes = response.body().bytes();
             String body = new String(bytes);
             JsonElement element = new com.google.gson.JsonParser().parse(body);
-            return element.getAsJsonArray().get(0).getAsJsonArray().get(0).getAsJsonArray().get(0).getAsString();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        return null;
+            StringBuilder builder = new StringBuilder();
+            element.getAsJsonArray().get(0).getAsJsonArray()
+                    .forEach(jsonElement -> builder.append(jsonElement.getAsJsonArray().get(0).getAsString()));
+
+            return builder.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

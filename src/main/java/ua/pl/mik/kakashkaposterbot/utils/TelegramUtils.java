@@ -35,8 +35,8 @@ public class TelegramUtils {
     public static long getUserId(Update update) {
         if (update.getMessage() != null) {
             return getUserId(update.getMessage());
-        } else if (update.getCallbackQuery().getMessage() != null) {
-            return getUserId(update.getCallbackQuery().getMessage());
+        } else if (update.getCallbackQuery() != null) {
+            return update.getCallbackQuery().getFrom().getId();
         }
         throw new RuntimeException();
     }
@@ -104,7 +104,7 @@ public class TelegramUtils {
                 .map(app -> {
                     InlineKeyboardButton button = new InlineKeyboardButton();
                     button.setText(app.getName());
-                    button.setCallbackData(command + " " + String.valueOf(app.id));
+                    button.setCallbackData(command + " " + app.id);
                     return button;
                 })
                 .map(Collections::singletonList)
@@ -120,6 +120,10 @@ public class TelegramUtils {
             return null;
         }
         switch (apiVersion) {
+            case 27:
+                return "8.1";
+            case 26:
+                return "8.0";
             case 25:
                 return "7.1";
             case 24:

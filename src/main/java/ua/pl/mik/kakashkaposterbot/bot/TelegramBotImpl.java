@@ -1,6 +1,8 @@
 package ua.pl.mik.kakashkaposterbot.bot;
 
 import com.google.common.io.Files;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
@@ -16,8 +18,12 @@ import ua.pl.mik.kakashkaposterbot.bot.handlers.StatusHandler;
 import ua.pl.mik.kakashkaposterbot.bot.handlers.addapp.AddAppHandler;
 import ua.pl.mik.kakashkaposterbot.bot.handlers.addapp.KeyFileHandler;
 import ua.pl.mik.kakashkaposterbot.bot.handlers.addapp.PackageNameHandler;
+import ua.pl.mik.kakashkaposterbot.bot.handlers.appmanagement.activation.ActivateAppNameHandler;
+import ua.pl.mik.kakashkaposterbot.bot.handlers.appmanagement.activation.ActivateHandler;
 import ua.pl.mik.kakashkaposterbot.bot.handlers.appmanagement.activation.DeactivateAppNameHandler;
 import ua.pl.mik.kakashkaposterbot.bot.handlers.appmanagement.activation.DeactivateHandler;
+import ua.pl.mik.kakashkaposterbot.bot.handlers.appmanagement.changechat.ChangeChatAppNameHandler;
+import ua.pl.mik.kakashkaposterbot.bot.handlers.appmanagement.changechat.ChangeChatHandler;
 import ua.pl.mik.kakashkaposterbot.bot.handlers.appmanagement.changelanguage.ChangeLanguageCallbackHandler;
 import ua.pl.mik.kakashkaposterbot.bot.handlers.appmanagement.changelanguage.ChangeLanguageHandler;
 import ua.pl.mik.kakashkaposterbot.bot.handlers.appmanagement.changelanguage.ChangeLanguageName;
@@ -35,6 +41,7 @@ import java.nio.charset.Charset;
 public class TelegramBotImpl extends TelegramLongPollingBot {
 
     public static final String TOKEN;
+    private static final Logger logger = LoggerFactory.getLogger(TelegramBotImpl.class);
 
     static {
         try {
@@ -72,6 +79,10 @@ public class TelegramBotImpl extends TelegramLongPollingBot {
             new StatusHandler(),
             new DeactivateHandler(),
             new DeactivateAppNameHandler(),
+            new ActivateHandler(),
+            new ActivateAppNameHandler(),
+            new ChangeChatHandler(),
+            new ChangeChatAppNameHandler(),
 
             // Set name flow
             new SetNameInitHandler(),
@@ -95,7 +106,7 @@ public class TelegramBotImpl extends TelegramLongPollingBot {
             try {
                 if (handler.handle(update)) {
                     handled = true;
-                    System.out.println("Handled by " + handler.getClass().getName());
+                    logger.debug("Handled by {}", handler.getClass().getName());
                     break;
                 }
             } catch (TelegramApiException e) {
@@ -113,7 +124,7 @@ public class TelegramBotImpl extends TelegramLongPollingBot {
             }
         }
         if (!handled) {
-            System.out.println("Message not handled by anyone");
+            logger.debug("Message not handled by anyone");
         }
     }
 

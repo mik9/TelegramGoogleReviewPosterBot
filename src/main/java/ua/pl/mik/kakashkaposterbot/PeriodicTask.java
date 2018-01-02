@@ -1,6 +1,8 @@
 package ua.pl.mik.kakashkaposterbot;
 
 import com.google.api.services.androidpublisher.model.Review;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ua.pl.mik.kakashkaposterbot.bot.TelegramReview;
 import ua.pl.mik.kakashkaposterbot.db.Database;
@@ -13,6 +15,7 @@ import java.util.List;
 public class PeriodicTask implements Runnable {
 
     private App app;
+    private static final Logger logger = LoggerFactory.getLogger(PeriodicTask.class);
 
     public PeriodicTask(App app) {
         this.app = app;
@@ -22,18 +25,20 @@ public class PeriodicTask implements Runnable {
     public void run() {
         try {
             runInternal();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Throwable e) {
+            LoggerFactory.getLogger(PeriodicTask.class)
+                    .error("Error in review processing: ", e);
         }
     }
 
     private void runInternal() {
-        System.out.println("Running update task for: " + app.packageName);
+        logger.debug("Running update task for: {}", app.packageName);
         List<Review> reviews = GoogleApi.getNewReviews(app.packageName, app.keyFilePath, app.lastReviewId);
-        System.out.println("Got " + reviews.size() + " new reviews");
+        logger.debug("Got {} new reviews", reviews.size());
         if (!reviews.isEmpty()) {
             app.lastReviewId = reviews.get(0).getReviewId();
         }
+        reviews.forEach(review -> logger.debug(review.toString()));
         reviews.stream()
                 .map(TelegramReview::new)
                 .map(review -> {
