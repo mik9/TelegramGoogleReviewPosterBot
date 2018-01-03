@@ -58,6 +58,9 @@ public class ActivateAppNameHandler extends BaseCallbackQueryHandler {
             sendMessage.setText("Завдання увімкнено.");
 
             TelegramBotImpl.telegramAbsSender.sendMessage(sendMessage);
+
+            chat.state = ChatState.NO_STATE;
+            Database.get().saveChat(chat);
         } else {
             TelegramUtils.sendSimpleTextMessage(getChatId(update), "Не знаю такої програми: \"" + userText + "\"");
         }

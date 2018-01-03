@@ -19,7 +19,7 @@ public class StartHandler extends BaseTextMessageHandler {
         }
 
         if (message.contains(" ")) {
-            long pendingAppId = Long.valueOf(message.split(" ")[1]);
+            long pendingAppId = Long.parseLong(message.split(" ")[1]);
             App app = Database.get()
                     .createApp(Database.get().getPendingApp(pendingAppId), getChatId(update), getUserId(update));
             Scheduler.scheduleApp(app);

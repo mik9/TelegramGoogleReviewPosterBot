@@ -58,6 +58,9 @@ public class DeactivateAppNameHandler extends BaseCallbackQueryHandler {
             sendMessage.setText("Завдання вимкнено але не видалено.");
 
             TelegramBotImpl.telegramAbsSender.sendMessage(sendMessage);
+
+            chat.state = ChatState.NO_STATE;
+            Database.get().saveChat(chat);
         } else {
             TelegramUtils.sendSimpleTextMessage(getChatId(update), "Не знаю такої програми: \"" + userText + "\"");
         }
