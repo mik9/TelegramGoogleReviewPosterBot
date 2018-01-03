@@ -40,12 +40,11 @@ public class PeriodicTask implements Runnable {
         }
         reviews.forEach(review -> logger.debug(review.toString()));
         reviews.stream()
-                .map(TelegramReview::new)
-                .map(review -> {
+                .map(review1 -> new TelegramReview(review1, app.packageName))
+                .peek(review -> {
                     if (review.text != null) {
                         review.text = GoogleApi.translate(review.text, app.translateLanguage);
                     }
-                    return review;
                 })
                 .forEach(s -> {
                     try {

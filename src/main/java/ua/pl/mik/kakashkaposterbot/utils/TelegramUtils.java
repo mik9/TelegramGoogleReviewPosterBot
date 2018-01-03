@@ -149,7 +149,7 @@ public class TelegramUtils {
             case 14:
                 return "4.0";
             default:
-                return "unknown";
+                return "Unknown (" + apiVersion + ")";
         }
     }
 }

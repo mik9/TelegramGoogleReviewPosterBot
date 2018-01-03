@@ -15,17 +15,21 @@ public class TelegramReview {
     private final String androidVersion;
     @Nullable
     private final String deviceName;
+    private final String appName;
 
-    public TelegramReview(Review review) {
+    public TelegramReview(Review review, String appName) {
         text = review.getComments().get(0).getUserComment().getText();
         stars = review.getComments().get(0).getUserComment().getStarRating();
         authorName = review.getAuthorName();
         androidVersion = androidApiVersionToString(review.getComments().get(0).getUserComment().getAndroidOsVersion());
         deviceName = review.getComments().get(0).getUserComment().getDevice();
+        this.appName = appName;
     }
 
     public String render() {
         StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(appName)
+                .append(":\n");
         stringBuilder.append(authorName);
         if (deviceName != null) {
             stringBuilder.append(" from ")
